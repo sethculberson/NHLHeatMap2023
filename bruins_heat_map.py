@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.font_manager as font_manager
 from scipy.interpolate import griddata
 from scipy.ndimage import gaussian_filter
+plt.rcParams["toolbar"] = "None"
 
 font_path = "/Users/sethculberson/Library/Fonts/Gotham-Black.otf"
 font_props = font_manager.FontProperties(fname=font_path)
