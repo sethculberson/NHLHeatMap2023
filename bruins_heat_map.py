@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import hockey_rink
+from matplotlib.widgets import TextBox
 
 #Disabling the toolbar in matplot
 plt.rcParams["toolbar"] = "None"
@@ -19,20 +20,29 @@ filtered_df = filtered_df[filtered_df["xCordAdjusted"] <= 89]
 #set up rink and fig, axes
 rink = hockey_rink.Rink(rotation=90,net={"visible": False}) #rotating the rink vertically
 fig, axes = plt.subplots(1,1,figsize=(6,8))
+rink.draw(display_range="ozone")
+ax_box = plt.axes([0.1,0.05,0.8,0.07])
+
+textbox = TextBox(ax_box, "Name", initial="Connor McDavid")
 
 #In the future, the name will be input by the user, and the heat map will be generated
 def plot_shots_by_name(text):
     player_name = text
-    playerspecific_df = filtered_df[filtered_df["shooterName"]==player_name]
-    
-    goals = playerspecific_df[playerspecific_df["goal"]==1]
-    misses = playerspecific_df[playerspecific_df["goal"]==0]
+    if not filtered_df[filtered_df["shooterName"]==player_name].empty:
+        player_name = text
+        playerspecific_df = filtered_df[filtered_df["shooterName"]==player_name]
+        
+        goals = playerspecific_df[playerspecific_df["goal"]==1]
+        misses = playerspecific_df[playerspecific_df["goal"]==0]
 
-    #create scatter plots for makes/misses, with the point size being weighted by the expected goal probability for the shot
-    rink.scatter(x=goals["xCordAdjusted"], y=goals["yCordAdjusted"], color="green",alpha=0.8,s=goals["xGoal"]*240+20, ax=axes,plot_range="ozone",draw_kw={"display_range": "ozone"})
-    rink.scatter(x=misses["xCordAdjusted"], y=misses["yCordAdjusted"], color="red",alpha=0.2, s=misses["xGoal"]*240+20,ax=axes,plot_range="ozone",draw_kw={"display_range": "ozone"})
-    plt.title(f"{player_name} 2023 Shots")
-    plt.show()
+        #create scatter plots for makes/misses, with the point size being weighted by the expected goal probability for the shot
+        rink.scatter(x=goals["xCordAdjusted"], y=goals["yCordAdjusted"], color="green",alpha=0.8,s=goals["xGoal"]*240+20, ax=axes,plot_range="ozone",draw_kw={"display_range": "ozone"})
+        rink.scatter(x=misses["xCordAdjusted"], y=misses["yCordAdjusted"], color="red",alpha=0.2, s=misses["xGoal"]*240+20,ax=axes,plot_range="ozone",draw_kw={"display_range": "ozone"})
+        plt.title(f"{player_name} 2023 Shots")
+    else:
+        #todo: better mispelled name handling, perhaps autocompletion
+        print("Caught mispelled name!")
 
-#example usage of function
-plot_shots_by_name("Connor McDavid")
+#add textbox, display plot
+textbox.on_submit(plot_shots_by_name)
+plt.show()
