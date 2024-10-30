@@ -12,7 +12,7 @@ data_to_track = ["shooterName","xGoal","goal","xCordAdjusted","yCordAdjusted","s
 
 #In the future, the name will be input by the user, and the heat map will be generated
 def plot_shots_by_name(text):
-    rink = hockey_rink.Rink(rotation=90) #rotating the rink vertically
+    rink = hockey_rink.Rink(rotation=90,net={"visible": False}) #rotating the rink vertically
     
     player_name = text
     
@@ -31,6 +31,7 @@ def plot_shots_by_name(text):
     #create scatter plots for makes/misses, with the point size being weighted by the expected goal probability for the shot
     rink.scatter(x=goals["xCordAdjusted"], y=goals["yCordAdjusted"], color="green",alpha=0.8,s=goals["xGoal"]*240+20, ax=axes,plot_range="ozone",draw_kw={"display_range": "ozone"})
     rink.scatter(x=misses["xCordAdjusted"], y=misses["yCordAdjusted"], color="red",alpha=0.2, s=misses["xGoal"]*240+20,ax=axes,plot_range="ozone",draw_kw={"display_range": "ozone"})
+    plt.title(f"{player_name} 2023 Shots")
     plt.show()
 
 #example usage of function
