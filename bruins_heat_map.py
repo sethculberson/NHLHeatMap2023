@@ -2,22 +2,25 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import hockey_rink
 
+#Disabling the toolbar in matplot
 plt.rcParams["toolbar"] = "None"
-
-data_to_track = ["shooterName","xGoal","goal","xCordAdjusted","yCordAdjusted","shotOnEmptyNet","shotDistance"]
 
 df = pd.read_csv('data/shots_2023.csv')
 
-#cleaning data
-filtered_df = df[data_to_track]
-filtered_df = filtered_df[filtered_df["shotOnEmptyNet"]==0]
-filtered_df = filtered_df[filtered_df["shotDistance"] <= 89]
-filtered_df = filtered_df[filtered_df["xCordAdjusted"] <= 89]
+#Selecting which statistics to analyze out of the data set
+data_to_track = ["shooterName","xGoal","goal","xCordAdjusted","yCordAdjusted","shotOnEmptyNet","shotDistance"]
 
+#In the future, the name will be input by the user, and the heat map will be generated
 def plot_shots_by_name(text):
-    rink = hockey_rink.Rink(rotation=90)
+    rink = hockey_rink.Rink(rotation=90) #rotating the rink vertically
+    
     player_name = text
+    
+    #cleaning the data
     filtered_df = df[data_to_track]
+    filtered_df = filtered_df[filtered_df["shotOnEmptyNet"]==0] #not tracking empty net shots
+    filtered_df = filtered_df[filtered_df["shotDistance"] <= 89]
+    filtered_df = filtered_df[filtered_df["xCordAdjusted"] <= 89]
     filtered_df = filtered_df[filtered_df["shooterName"]==player_name]
     
     goals = filtered_df[filtered_df["goal"]==1]
@@ -25,8 +28,10 @@ def plot_shots_by_name(text):
 
     fig, axes = plt.subplots(1,1,figsize=(6,8))
 
+    #create scatter plots for makes/misses, with the point size being weighted by the expected goal probability for the shot
     rink.scatter(x=goals["xCordAdjusted"], y=goals["yCordAdjusted"], color="green",alpha=0.8,s=goals["xGoal"]*240+20, ax=axes,plot_range="ozone",draw_kw={"display_range": "ozone"})
     rink.scatter(x=misses["xCordAdjusted"], y=misses["yCordAdjusted"], color="red",alpha=0.2, s=misses["xGoal"]*240+20,ax=axes,plot_range="ozone",draw_kw={"display_range": "ozone"})
     plt.show()
 
+#example usage of function
 plot_shots_by_name("Connor McDavid")
